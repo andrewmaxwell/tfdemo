@@ -9,6 +9,7 @@ echo "Zipping the Lambda function..."
 zip -r $ZIP_FILE $LAMBDA_FILE node_modules
 
 echo "Running Terraform apply..."
+cd terraform
 terraform apply -auto-approve
 
 echo "Deployment complete!"
