@@ -38,7 +38,6 @@ resource "aws_cloudfront_origin_access_control" "oac" {
   signing_protocol     = "sigv4"
 }
 
-
 resource "aws_s3_object" "frontend_files" {
   bucket = aws_s3_bucket.frontend_bucket.bucket
   key    = "index.html"
@@ -59,7 +58,7 @@ resource "aws_cloudfront_distribution" "cdn" {
   default_root_object = "index.html"
 
   default_cache_behavior {
-    allowed_methods  = ["GET", "HEAD"]
+    allowed_methods  = ["GET", "HEAD", "OPTIONS", "POST", "PUT", "DELETE", "PATCH"]
     cached_methods   = ["GET", "HEAD"]
     target_origin_id = aws_s3_bucket.frontend_bucket.bucket
     viewer_protocol_policy = "redirect-to-https"
@@ -119,10 +118,17 @@ resource "aws_apigatewayv2_api" "api" {
   protocol_type = "HTTP"
 }
 
-# Define a route for the API (e.g., /click)
+# Define a route for the API (supporting all methods)
 resource "aws_apigatewayv2_route" "click_route" {
   api_id    = aws_apigatewayv2_api.api.id
-  route_key = "POST /click"
+  route_key = "$default"
+  target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
+}
+
+# Define a route for OPTIONS method to support CORS
+resource "aws_apigatewayv2_route" "options_route" {
+  api_id    = aws_apigatewayv2_api.api.id
+  route_key = "OPTIONS /{proxy+}"
   target    = "integrations/${aws_apigatewayv2_integration.lambda_integration.id}"
 }
 
@@ -184,6 +190,25 @@ resource "aws_iam_role_policy" "lambda_policy" {
           "dynamodb:GetItem"
         ],
         "Resource": aws_dynamodb_table.click_counter.arn
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy" "lambda_logging_policy" {
+  name   = "lambda_logging_policy"
+  role   = aws_iam_role.lambda_exec.id
+  policy = jsonencode({
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Action": [
+          "logs:CreateLogGroup",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents"
+        ],
+        "Resource": "arn:aws:logs:*:*:*"
       }
     ]
   })

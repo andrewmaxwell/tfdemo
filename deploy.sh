@@ -2,7 +2,7 @@
 
 set -e
 
-LAMBDA_FILE="lambda.js"
+LAMBDA_FILE="index.js"
 ZIP_FILE="lambda.zip"
 
 echo "Zipping the Lambda function..."

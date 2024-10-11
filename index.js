@@ -8,7 +8,10 @@ const headers = {
 }
 
 exports.handler = async (event) => {
+  console.log("Received event:", JSON.stringify(event, null, 2));
+
   if (event.httpMethod === "OPTIONS") {
+    console.log("Handling OPTIONS request for CORS");
     return {
       statusCode: 200,
       headers,
@@ -28,6 +31,7 @@ exports.handler = async (event) => {
   try {
     const data = await dynamoDb.get(getParams).promise();
     counterExists = !!data.Item;
+    console.log("Counter exists:", counterExists);
   } catch (error) {
     console.error("Error checking if counter exists", error);
   }
@@ -43,6 +47,7 @@ exports.handler = async (event) => {
     };
     try {
       await dynamoDb.put(initParams).promise();
+      console.log("Initialized click counter in DynamoDB");
     } catch (error) {
       console.error("Error initializing counter", error);
       return {
@@ -64,12 +69,14 @@ exports.handler = async (event) => {
 
   try {
     const result = await dynamoDb.update(updateParams).promise();
+    console.log("Counter updated successfully:", result);
     return {
       statusCode: 200,
       headers,
       body: JSON.stringify({ count: result.Attributes.count })
     };
   } catch (error) {
+    console.error("Error updating the counter", error);
     return {
       statusCode: 500,
       headers,
