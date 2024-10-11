@@ -1,5 +1,7 @@
-const AWS = require('aws-sdk');
-const dynamoDb = new AWS.DynamoDB.DocumentClient();
+const { DynamoDBClient } = require("@aws-sdk/client-dynamodb");
+const { GetCommand, PutCommand, UpdateCommand } = require("@aws-sdk/lib-dynamodb");
+
+const dynamoDb = new DynamoDBClient();
 
 const headers = {
   "Access-Control-Allow-Origin": "*",
@@ -29,7 +31,7 @@ exports.handler = async (event) => {
 
   let counterExists = false;
   try {
-    const data = await dynamoDb.get(getParams).promise();
+    const data = await dynamoDb.send(new GetCommand(getParams));
     counterExists = !!data.Item;
     console.log("Counter exists:", counterExists);
   } catch (error) {
@@ -46,7 +48,7 @@ exports.handler = async (event) => {
       }
     };
     try {
-      await dynamoDb.put(initParams).promise();
+      await dynamoDb.send(new PutCommand(initParams));
       console.log("Initialized click counter in DynamoDB");
     } catch (error) {
       console.error("Error initializing counter", error);
@@ -68,7 +70,7 @@ exports.handler = async (event) => {
   };
 
   try {
-    const result = await dynamoDb.update(updateParams).promise();
+    const result = await dynamoDb.send(new UpdateCommand(updateParams));
     console.log("Counter updated successfully:", result);
     return {
       statusCode: 200,

@@ -187,7 +187,8 @@ resource "aws_iam_role_policy" "lambda_policy" {
         "Effect": "Allow",
         "Action": [
           "dynamodb:UpdateItem",
-          "dynamodb:GetItem"
+          "dynamodb:GetItem",
+          "dynamodb:PutItem"
         ],
         "Resource": aws_dynamodb_table.click_counter.arn
       }
