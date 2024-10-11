@@ -2,11 +2,17 @@
 
 set -e
 
-LAMBDA_FILE="index.js"
+FOLDER_NAME="lambda"
 ZIP_FILE="lambda.zip"
 
 echo "Zipping the Lambda function..."
-zip -r $ZIP_FILE $LAMBDA_FILE node_modules
+if [ -f $ZIP_FILE ]; then
+    rm $ZIP_FILE
+    echo "Existing '$ZIP_FILE' has been deleted."
+fi
+cd $FOLDER_NAME
+zip -r ../$ZIP_FILE ./*
+cd ..
 
 echo "Running Terraform apply..."
 cd terraform

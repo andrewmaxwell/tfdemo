@@ -28,7 +28,7 @@ resource "aws_s3_bucket_policy" "frontend_bucket_policy" {
 resource "aws_s3_object" "frontend_files" {
   bucket = aws_s3_bucket.frontend_bucket.bucket
   key    = "index.html"
-  source = "../index.html"
+  source = "../client/index.html"
   content_type = "text/html"
-  etag         = filemd5("../index.html")
+  etag         = filemd5("../client/index.html")
 }
