@@ -1,12 +1,7 @@
-# Terraform state and backup files
 *.tfstate
 *.tfstate.backup
-
-# Terraform lock file (optional)
 .terraform.lock.hcl
-
-# Terraform provider plugins
 .terraform/
-
-# Local files
 *.tfvars
+*.zip
+.DS_Store

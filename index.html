@@ -1,3 +1,21 @@
-<body>
-  <h1>hello world</h1>
-</body>
+<button id="click-btn">Click me</button>
+<p>Click count: <span id="click-count">0</span></p>
+
+<script>
+  const apiUrl = "https://k68yv5gqaa.execute-api.ap-south-1.amazonaws.com/prod";
+
+  async function updateClickCount() {
+    const response = await fetch(`${apiUrl}/click`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      mode: "cors"
+    });
+    const data = await response.json();
+    document.getElementById('click-count').innerText = data.count;
+  }
+
+  document.getElementById('click-btn').addEventListener('click', updateClickCount);
+
+  // Fetch the initial click count
+  updateClickCount();
+</script>
